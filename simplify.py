@@ -1,3 +1,14 @@
+"""
+Contains functions that return a DataFrame with only the best galaxy data in it.
+
+Attributes:
+
+Todo:
+    * Find out if should throw exceptions or have the code just blow up
+    * Find out what license type is used for the project
+    * Find out how to add an author to this header
+"""
+
 import pandas as pd
 import numpy as np
 
@@ -8,15 +19,31 @@ List of priority:
 3. RASS & HST
 4. RASS & SDSS | SAO-DSS
 """
-def simplify_csv(csv):
-    data = pd.read_csv(csv)
-    del data['Unnamed: 0']
-    data = __reduce(data)
-    data = data.sort_values(['Name'])
+def simplify(data_in):
+
+    """Aggregates the best data for each galaxy based on the priority list.
+
+    For multiple cores, it labels the cores in ascending order 
+    from coreA -> coreZ. It also removes "reg" from CNames
+
+    Args:
+        csv: The csv file to be read into a DataFrame and then standardized
+
+    Returns:
+        A pandas DataFrame with standardized "Region" values and CNames
+    """
+
+    if isinstance(data_in, str):
+        data = pd.read_csv(data_in)
+        del data['Unnamed: 0']
     
-    return data
-    
-def simplify_df(data):
+    elif isinstance(data_in, pd.DataFrame):
+        data = data_in
+
+    else:
+        print "Invalid Type: Only accepts strings and DataFrames"
+        return
+
     data = __reduce(data)
     data = data.sort_values(['Name'])
     
