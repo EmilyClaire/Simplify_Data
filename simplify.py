@@ -12,25 +12,24 @@ Todo:
 import pandas as pd
 import numpy as np
 
-"""
-List of priority:
-1. Chandra | XMM & HST
-2. Chandra | XMM & SDSS | SAO-DSS
-3. RASS & HST
-4. RASS & SDSS | SAO-DSS
-"""
 def simplify(data_in):
 
     """Aggregates the best data for each galaxy based on the priority list.
 
-    For multiple cores, it labels the cores in ascending order 
-    from coreA -> coreZ. It also removes "reg" from CNames
+    Takes in a csv file or data frame and returns a dataframe with only
+        the best galaxy data for each galaxy in this order:
 
+            List of priority:
+            1. Chandra | XMM & HST
+            2. Chandra | XMM & SDSS | SAO-DSS
+            3. RASS & HST
+            4. RASS & SDSS | SAO-DSS
+    
     Args:
-        csv: The csv file to be read into a DataFrame and then standardized
+        data_in: The csv file pathname or the DataFrame containing galaxy data
 
     Returns:
-        A pandas DataFrame with standardized "Region" values and CNames
+        A pandas DataFrame with only one value per galaxy based on priority list
     """
 
     if isinstance(data_in, str):
