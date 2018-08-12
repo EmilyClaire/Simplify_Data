@@ -159,7 +159,7 @@ def __reduce(data):
 
             if num_of_rows < 1:
                 print ('{} doesn\'t have any rows that fit the'\
-                ' parameters.'.format(name))
+                ' parameters given by the priority list.'.format(name))
 
             elif galaxy_df.shape[0] > 1:
                 print ('{} has {} rows that are \'best\'. Check your csv'\
