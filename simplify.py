@@ -67,7 +67,6 @@ def simplify(data_in):
     else:
         data = pd.DataFrame(data_in)
 
-
     #check to see if there is a random column in there named 'Unnamed: 0'
     #if so, delete the column
     if 'Unnamed: 0' in data.columns.values.tolist():
@@ -79,16 +78,45 @@ def simplify(data_in):
     return data
 
 def __reduce(data):
+    """Aggregates the best data for each galaxy based on the priority list.
+
+    Takes in a dataframe returns a dataframe with only the best galaxy data 
+        for each galaxy in this order:
+
+            List of priority:
+            1. Chandra | XMM & HST
+            2. Chandra | XMM & SDSS | SAO-DSS
+            3. RASS & HST
+            4. RASS & SDSS | SAO-DSS
+    
+    Args:
+        data: The DataFrame containing galaxy data
+
+    Returns:
+        A pandas DataFrame with only one value per galaxy based on priority list
+    """
+    
+    #A list of all the individual galaxy names. 
     galaxy_names = data.Name.unique().tolist()
+
+    #The DataFrame that will contain the reduced data
     reduced_data = pd.DataFrame()
     
+    #Loops through each galaxy name and pulls out the best data for each
     for name in galaxy_names:
 
+        #Sets a variable named galaxy_df to the row that has the 
+        #current galaxy name and an x-ray Source that is CHandra or XMM and 
+        #an OP Source that equals HST
         #1. Chandra | XMM & HST
         galaxy_df = data[(data['Name'] == name) 
             & ((data['x-ray Source'] == 'Chandra') 
             | (data['x-ray Source'] == 'XMM')) & (data['Op Source'] == 'HST')]
         
+        #If there is not a row that contains the current galaxy name,
+        #an x-ray Source that is Chandra or XMMM and an Op Source that is HST
+        #Then set glaxy_df equal to a row that has an x-ray source of 
+        #Chandra of XMM and an Op Source of SDSS or SAO-DSS
         #2. Chandra | XMM & SDSS | SAO-DSS
         if galaxy_df.shape[0] == 0:
             galaxy_df = data[(data['Name'] == name) 
@@ -97,12 +125,20 @@ def __reduce(data):
                 & ((data['Op Source'] == 'SDSS') 
                 | (data['Op Source'] == 'SAO-DSS'))]
 
+            #If there is not a row that contains the current galaxy name,
+            #an x-ray Source that is Chandra or XMMM and an Op Source that is 
+            #SDSS or SAO-DSS, then set glaxy_df equal to a row that 
+            #has an x-ray source of Rass and an Op Source of HST
             #3. RASS & HST
             if galaxy_df.shape[0] == 0:
                 galaxy_df = data[(data['Name'] == name) 
                     & (data['x-ray Source'] == 'RASS') 
                     & (data['Op Source'] == 'HST')]
 
+                #If there is not a row that contains the current galaxy name,
+                #an x-ray Source that is RAAA and an Op Source that is 
+                #SDSS or SAO-DSS, then set glaxy_df equal to a row that 
+                #has an x-ray source of Rass and an Op Source of SDSS or SAO-SDSS
                 #4. RASS & SDSS | SAO-DSS
                 if galaxy_df.shape[0] == 0:
                     galaxy_df = data[(data['Name'] == name) 
@@ -111,9 +147,19 @@ def __reduce(data):
                         & ((data['Op Source'] == 'SDSS') 
                         | (data['Op Source'] == 'SAO-DSS'))]
 
-        if galaxy_df.shape[0] > 0:
+        #Checks to see if galaxy_df has one row and then adds that row to 
+        #reduced_data
+        if galaxy_df.shape[0] ==  1:
             reduced_data = reduced_data.append(galaxy_df)
+
+        #checks to see if there are more than 1 row returned
+        elif galaxy_df.shape[0] > 1:
+            print ('{} has {} rows that are \'best\'. Check your csv'\
+                ' for double row entries').format(name, galaxy_df.shape[0])
+        
+        #checks to see if there are no entries that fit the parameters
         else:
-            print 'oh no {} doesn\'t have any useable data'.format(name)
+            print ('{} doesn\'t have any rows that fit the'\
+            ' parameters.'.format(name))
 
     return reduced_data
