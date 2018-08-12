@@ -1,4 +1,4 @@
-"""
+"""Reduces the data in the csv to only one row per galaxy
 Contains functions that return a DataFrame with only the best galaxy data in it.
 
 Attributes:
