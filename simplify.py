@@ -148,18 +148,26 @@ def __reduce(data):
                         | (data['Op Source'] == 'SAO-DSS'))]
 
         #Checks to see if galaxy_df has one row and then adds that row to 
-        #reduced_data
-        if galaxy_df.shape[0] ==  1:
-            reduced_data = reduced_data.append(galaxy_df)
+        #reduced_data. If it has more or less than one row, print error message
+        #and do not add anything to reduced_data.
+        try:
+            num_of_rows = galaxy_df.shape[0]
 
-        #checks to see if there are more than 1 row returned
-        elif galaxy_df.shape[0] > 1:
-            print ('{} has {} rows that are \'best\'. Check your csv'\
-                ' for double row entries').format(name, galaxy_df.shape[0])
-        
-        #checks to see if there are no entries that fit the parameters
+            assert (num_of_rows ==  1)
+
+        except AssertionError as error:
+
+            if num_of_rows < 1:
+                print ('{} doesn\'t have any rows that fit the'\
+                ' parameters.'.format(name))
+
+            elif galaxy_df.shape[0] > 1:
+                print ('{} has {} rows that are \'best\'. Check your csv'\
+                    ' for double row entries. No rows for this galaxy were '\
+                    'added to the DataFrame.').format(name, galaxy_df.shape[0])
+
+        #if the number of rows == 1 then append the row to the reduced_data
         else:
-            print ('{} doesn\'t have any rows that fit the'\
-            ' parameters.'.format(name))
+           reduced_data = reduced_data.append(galaxy_df)
 
     return reduced_data
